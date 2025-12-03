@@ -1,0 +1,31 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Debug server",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/server/build/server.exe",
+            "args": [],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}/server/build",
+            "environment": [],
+            "externalConsole": false,
+            "MIMode": "gdb",
+            "preLaunchTask": "Build server"
+        },
+        {
+            "name": "Debug client",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/client/build/client.exe",
+            "args": [],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}/client/build",
+            "environment": [],
+            "externalConsole": false,
+            "MIMode": "gdb",
+            "preLaunchTask": "Build client"
+        },
+    ]
+}

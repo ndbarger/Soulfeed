@@ -1,0 +1,59 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Build server",
+            "type": "shell",
+            "command": "gcc",
+            "args": [
+                "-g",
+                "server/src/main.c",
+                "server/src/server.c",
+                "server/src/error.c",
+                "-o",
+                "server/build/server.exe",
+                "-lws2_32"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": false
+            },
+            "problemMatcher": [
+                "$gcc"
+            ],
+            "detail": "Compiles the server"
+        },
+        {
+            "label": "Run server",
+            "type": "shell",
+            "command": "./server/build/server.exe",
+            "dependsOn": "Build server",
+            "problemMatcher": []
+        },
+        {
+            "label": "Build client",
+            "type": "shell",
+            "command": "gcc",
+            "args": [
+                "-g",
+                "client/src/main.c",
+                "-o",
+                "client/build/client.exe",
+                "-lws2_32"
+            ],
+            "group": {
+                "kind": "build"
+            },
+            "problemMatcher": [
+                "$gcc"
+            ],
+            "detail": "Compiles the client"
+        },
+        {
+            "label": "Run client",
+            "type": "shell",
+            "command": "./client/build/client.exe",
+            "dependsOn": "Build client"
+        }
+    ]
+}
