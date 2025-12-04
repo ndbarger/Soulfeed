@@ -2,6 +2,13 @@
 
 #include "server.h"
 #include "error.h"
+#include "request.h"
+
+/*
+TODO:
+
+Logic needed for handling multiple clients.
+*/
 
 void server_cleanup(Server *s)
 {
@@ -70,41 +77,35 @@ void server_run(Server *s)
         
         for (int i = 0; i < MAX_CLIENTS; i++)
         {
-            SOCKET s_ = i;
+            SOCKET sock = i;
             
             if (FD_ISSET(s->listen_socket, &s->read_set))
             {
                 s->client_socket = accept(s->listen_socket, (SA*)&s->client_addr, &s->addr_len);
                 printf("New connection: %d\n", s->client_socket);
                 FD_SET(s->client_socket, &s->master_set);
-            } else if (FD_ISSET(s_, &s->read_set))
+            } else if (FD_ISSET(sock, &s->read_set))
             {
                 char buffer[BUFFER_SIZE];
-                int bytes = recv(s_, buffer, sizeof(buffer), 0);
+                int bytes = recv(sock, buffer, sizeof(buffer), 0);
 
                 if (bytes <= 0)
                 {
-                    printf("Client %d disconnected.\n", s_);
-                    closesocket(s_);
-                    FD_CLR(s_, &s->master_set);
+                    printf("Client %d disconnected.\n", sock);
+                    closesocket(sock);
+                    FD_CLR(sock, &s->master_set);
                 } else
                 {
-                    // insert request stuff
-                    /*
-                    request_enqueue(s_, buffer, bytes);
-                    */
-                    printf("Client %d: %s\n", s_, buffer);
+                    request_enqueue(s, sock, buffer, bytes);
+                    printf("Client %d: %s\n", sock, buffer);
                 }
-            } else if (FD_ISSET(s_, &s->write_set))
+            } else if (FD_ISSET(sock, &s->write_set))
             {
-                // insert request stuff
-                /*
-                if (request_has_response(s_))
+                if (request_has_response(s, sock))
                 {
-                    char* response = request_get_response(s_);
+                    char* response = request_get_response(s, sock);
                     send(s, response, strlen(response), 0);
                 }
-                */
             }
         }
     }
