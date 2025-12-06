@@ -3,12 +3,31 @@
 #include "server.h"
 #include "error.h"
 #include "request.h"
+#include "threading.h"
 
 /*
 TODO:
 
 Logic needed for handling multiple clients.
 */
+
+DWORD WINAPI server_handle_client(void* arg)
+{
+    SOCKET client_socket = (SOCKET)arg;
+    char buffer[1024];
+    int bytes;
+
+    while ((bytes = recv(client_socket, buffer, sizeof(buffer), 0)) > 0)
+    {
+        buffer[bytes] = '\0';
+        printf("Client %d: %s\n", client_socket, buffer);
+        send(client_socket, buffer, bytes, 0);
+    }
+
+    closesocket(client_socket);
+
+    return 0;
+}
 
 void server_cleanup(Server *s)
 {
@@ -56,9 +75,7 @@ int server_initialize(Server *s)
         return 1;
     }
 
-    // initialize master set
-    FD_ZERO(&s->master_set);
-    FD_SET(s->listen_socket, &s->master_set);
+    // Initialize clients
 
     printf("Server initialized.\n");
 
@@ -69,45 +86,10 @@ void server_run(Server *s)
 {
     while (s->running)
     {
-        s->read_set = s->master_set;
-        s->write_set = s->master_set;
+        s->client_socket = accept(s->listen_socket, NULL, NULL);
 
-        if (select(0, &s->read_set, &s->write_set, NULL, NULL) == SOCKET_ERROR)
-            break;
-        
-        for (int i = 0; i < MAX_CLIENTS; i++)
-        {
-            SOCKET sock = i;
-            
-            if (FD_ISSET(s->listen_socket, &s->read_set))
-            {
-                s->client_socket = accept(s->listen_socket, (SA*)&s->client_addr, &s->addr_len);
-                printf("New connection: %d\n", s->client_socket);
-                FD_SET(s->client_socket, &s->master_set);
-            } else if (FD_ISSET(sock, &s->read_set))
-            {
-                char buffer[BUFFER_SIZE];
-                int bytes = recv(sock, buffer, sizeof(buffer), 0);
-
-                if (bytes <= 0)
-                {
-                    printf("Client %d disconnected.\n", sock);
-                    closesocket(sock);
-                    FD_CLR(sock, &s->master_set);
-                } else
-                {
-                    request_enqueue(s, sock, buffer, bytes);
-                    printf("Client %d: %s\n", sock, buffer);
-                }
-            } else if (FD_ISSET(sock, &s->write_set))
-            {
-                if (request_has_response(s, sock))
-                {
-                    char* response = request_get_response(s, sock);
-                    send(s, response, strlen(response), 0);
-                }
-            }
-        }
+        Thread* t = thread_create(server_handle_client, (void*)s->client_socket);
+        thread_close(t);
     }
 
     server_cleanup(s);

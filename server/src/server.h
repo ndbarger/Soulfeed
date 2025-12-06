@@ -8,7 +8,7 @@
 
 #define SERVER_PORT 8080
 #define BUFFER_SIZE 1024
-#define MAX_CLIENTS FD_SETSIZE
+#define MAX_CLIENTS 32
 
 typedef struct Server
 {
@@ -16,7 +16,7 @@ typedef struct Server
     WSADATA wsaData;
     SOCKET listen_socket, client_socket;
     struct sockaddr_in server_addr, client_addr;
-    fd_set master_set, read_set, write_set;
+    SOCKET clients[MAX_CLIENTS];
     int addr_len;
     int running;
 } Server;
