@@ -4,7 +4,7 @@
 
 int main()
 {
-    Server *server;
+    Server* server;
 
     if (server_initialize(server) == 1)
     {

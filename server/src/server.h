@@ -14,12 +14,14 @@ typedef struct Server
 {
     /* server object */
     WSADATA wsaData;
-    SOCKET listen_socket, client_socket;
+    SOCKET listen_socket;
     struct sockaddr_in server_addr, client_addr;
     SOCKET clients[MAX_CLIENTS];
     int addr_len;
     int running;
 } Server;
+
+DWORD WINAPI server_handle_client(void* arg);
 
 int server_initialize(Server *s);
 void server_run(Server *s);

@@ -5,12 +5,6 @@
 #include "request.h"
 #include "threading.h"
 
-/*
-TODO:
-
-Logic needed for handling multiple clients.
-*/
-
 DWORD WINAPI server_handle_client(void* arg)
 {
     SOCKET client_socket = (SOCKET)arg;
@@ -31,7 +25,6 @@ DWORD WINAPI server_handle_client(void* arg)
 
 void server_cleanup(Server *s)
 {
-    closesocket(s->client_socket);
     closesocket(s->listen_socket);
 
     WSACleanup();
@@ -84,12 +77,33 @@ int server_initialize(Server *s)
 
 void server_run(Server *s)
 {
+    int result;
+
+    // listening mode
+    result = listen(s->listen_socket, SOMAXCONN);
+    if (result == SOCKET_ERROR)
+    {
+        error_throw(ERROR_SOCKET_LISTEN, WSAGetLastError());
+        server_cleanup(s);
+        exit(1);
+    }
+
+    // main loop
     while (s->running)
     {
-        s->client_socket = accept(s->listen_socket, NULL, NULL);
+        printf("Awaiting client...\n");
 
-        Thread* t = thread_create(server_handle_client, (void*)s->client_socket);
-        thread_close(t);
+        SOCKET client_socket = accept(s->listen_socket, NULL, NULL);
+        if (client_socket == INVALID_SOCKET)
+        {
+            printf("Accept failed: %d\n", WSAGetLastError());
+            continue;
+        }
+
+        printf("Accepted client %d.\n", client_socket);
+
+        Thread *t = thread_create(server_handle_client, (void*)client_socket);
+        thread_detach(t); // lose the handle
     }
 
     server_cleanup(s);

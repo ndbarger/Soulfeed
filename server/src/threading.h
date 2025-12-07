@@ -14,6 +14,6 @@ typedef struct
 Thread* thread_create(ThreadFunc func, void* arg);
 
 void thread_join(Thread* t);
-void thread_close(Thread* t);
+void thread_detach(Thread* t);
 
 #endif

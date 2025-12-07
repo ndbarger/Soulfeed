@@ -15,6 +15,9 @@ void error_throw(ServerError e, int code)
     } else if (e == ERROR_SERVER_BIND)
     {
         msg = ERROR_SERVER_MSG;
+    } else if (e == ERROR_SOCKET_LISTEN)
+    {
+        msg = ERROR_SOCKET_MSG;
     }
 
     fprintf(stderr, "%s", msg, code);
