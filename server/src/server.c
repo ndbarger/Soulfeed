@@ -15,8 +15,15 @@ DWORD WINAPI server_handle_client(void* arg)
     {
         buffer[bytes] = '\0';
         printf("Client %d: %s\n", client_socket, buffer);
+        if (buffer == "disconnect;")
+            break;
         send(client_socket, buffer, bytes, 0);
     }
+
+    char* msg = "disconnected;";
+    send(client_socket, msg, sizeof(msg), 0);
+
+    printf("Client %d disconnected.\n", client_socket);
 
     closesocket(client_socket);
 
@@ -68,7 +75,14 @@ int server_initialize(Server *s)
         return 1;
     }
 
-    // Initialize clients
+    // listening mode
+    result = listen(s->listen_socket, SOMAXCONN);
+    if (result == SOCKET_ERROR)
+    {
+        error_throw(ERROR_SOCKET_LISTEN, WSAGetLastError());
+        server_cleanup(s);
+        exit(1);
+    }
 
     printf("Server initialized.\n");
 
@@ -78,15 +92,6 @@ int server_initialize(Server *s)
 void server_run(Server *s)
 {
     int result;
-
-    // listening mode
-    result = listen(s->listen_socket, SOMAXCONN);
-    if (result == SOCKET_ERROR)
-    {
-        error_throw(ERROR_SOCKET_LISTEN, WSAGetLastError());
-        server_cleanup(s);
-        exit(1);
-    }
 
     // main loop
     while (s->running)

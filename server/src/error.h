@@ -5,7 +5,11 @@
 #define ERROR_SOCKET_MSG "Socket error: %d"
 #define ERROR_SERVER_MSG "Server bind failed: %d"
 
-typedef enum ServerError
+/*
+TODO: add built-in program closing after error; expand error handling functionality
+*/
+
+typedef enum
 {
     ERROR_WSA_STARTUP,
     ERROR_SOCKET_INIT,

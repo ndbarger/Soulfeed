@@ -3,7 +3,7 @@
 #include "threading.h"
 
 /*
-TODO: fix dangling pointer
+
 */
 
 Thread* thread_create(ThreadFunc func, void* arg)

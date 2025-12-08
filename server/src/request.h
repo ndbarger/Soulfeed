@@ -2,10 +2,19 @@
 #define REQUEST_H
 
 #include "server.h"
+#include "lex.h"
 
 /*
 Logic for requests
 */
+
+typedef struct
+{
+    SOCKET socket;
+    char* msg;
+    LexToken func;
+} Request;
+
 
 void request_enqueue(Server *s, SOCKET sock, char* msg, int bytes);
 
