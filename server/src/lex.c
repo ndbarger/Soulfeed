@@ -36,10 +36,11 @@ struct T_Lex* lex_code(char* str)
             if (lbl_type == 0 && is_lbl) // function
             {
                 is_lbl = FALSE; // end label
-                char* _ = malloc(num_tokens*TLEX_SIZE+1);
+                current_lbl[lbl_counter+1] = '\0';
+                char* _ = malloc(lbl_counter*TLEX_SIZE+1);
                 memcpy(_, current_lbl, lbl_counter);
                 lbl_counter = 0;
-                t_[num_tokens*TLEX_SIZE] = TLEX_FUNC(_);
+                t_[num_tokens] = TLEX_FUNC(_);
                 num_tokens++;
                 continue;
             } else if (lbl_type == 1 && is_lbl)
@@ -49,7 +50,7 @@ struct T_Lex* lex_code(char* str)
             }
         } else if (str[i] == ';')
         {
-            t_[num_tokens*TLEX_SIZE] = TLEX_SEMICOLON;
+            t_[num_tokens] = TLEX_SEMICOLON;
             num_tokens++;
             continue;
         } else if (char_in_str(str[i], TLEX_LETTERS))

@@ -20,7 +20,7 @@ int main()
 
    printf("Done\n");
 
-   printf("%s", l[1].value);
+   printf("%s: %s", l[0].repr, l[0].value);
 
     return 0;
 }
