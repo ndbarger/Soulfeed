@@ -10,9 +10,8 @@
 #define BUFFER_SIZE 1024
 #define MAX_CLIENTS 32
 
-typedef struct Server
+typedef struct
 {
-    /* server object */
     WSADATA wsaData;
     SOCKET listen_socket;
     struct sockaddr_in server_addr, client_addr;

@@ -5,6 +5,9 @@
 #define ERROR_SOCKET_MSG "Socket error: %d"
 #define ERROR_SERVER_MSG "Server bind failed: %d"
 
+#define ERROR_LEX_MSG "Undefined reference: %s"
+#define ERROR_PARSE_MSG "Syntax error: %s"
+
 /*
 TODO: add built-in program closing after error; expand error handling functionality
 */
@@ -17,6 +20,13 @@ typedef enum
     ERROR_SOCKET_LISTEN
 } ServerError;
 
-void error_throw(ServerError e, int code);
+typedef enum
+{
+    ERROR_LEX,
+    ERROR_PARSE
+} RequestError;
+
+void s_error_throw(ServerError e, int code);
+void l_error_throw(RequestError e, char* c);
 
 #endif

@@ -2,7 +2,7 @@
 
 #include "error.h"
 
-void error_throw(ServerError e, int code)
+void s_error_throw(ServerError e, int code)
 {
     char* msg;
 
@@ -21,4 +21,19 @@ void error_throw(ServerError e, int code)
     }
 
     fprintf(stderr, "%s", msg, code);
+}
+
+void l_error_throw(RequestError e, char* c)
+{
+    char* msg;
+
+    if (e == ERROR_LEX)
+    {
+        msg = ERROR_LEX_MSG;
+    } else if (e == ERROR_PARSE)
+    {
+        msg = ERROR_PARSE_MSG;
+    }
+
+    fprintf(stderr, "%s", msg, c);
 }

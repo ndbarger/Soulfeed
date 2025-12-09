@@ -49,7 +49,7 @@ int server_initialize(Server *s)
     result = WSAStartup(MAKEWORD(2, 2), &s->wsaData);
     if (result != 0)
     {
-        error_throw(ERROR_WSA_STARTUP, result);
+        s_error_throw(ERROR_WSA_STARTUP, result);
         return 1;
     }
 
@@ -57,7 +57,7 @@ int server_initialize(Server *s)
     s->listen_socket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
     if (s->listen_socket == INVALID_SOCKET)
     {
-        error_throw(ERROR_SOCKET_INIT, WSAGetLastError());
+        s_error_throw(ERROR_SOCKET_INIT, WSAGetLastError());
         WSACleanup();
         return 1;
     }
@@ -70,7 +70,7 @@ int server_initialize(Server *s)
     if (bind(s->listen_socket, (SA*)&s->server_addr, sizeof(s->server_addr)) == SOCKET_ERROR)
     {
 
-        error_throw(ERROR_SERVER_BIND, WSAGetLastError());
+        s_error_throw(ERROR_SERVER_BIND, WSAGetLastError());
         server_cleanup(s);
         return 1;
     }
@@ -79,7 +79,7 @@ int server_initialize(Server *s)
     result = listen(s->listen_socket, SOMAXCONN);
     if (result == SOCKET_ERROR)
     {
-        error_throw(ERROR_SOCKET_LISTEN, WSAGetLastError());
+        s_error_throw(ERROR_SOCKET_LISTEN, WSAGetLastError());
         server_cleanup(s);
         exit(1);
     }
